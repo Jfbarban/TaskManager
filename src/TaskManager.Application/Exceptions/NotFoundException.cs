@@ -1,0 +1,7 @@
+﻿namespace TaskManager.Application.Exceptions;
+
+/// <summary>El recurso pedido no existe → 404.</summary>
+public class NotFoundException : Exception
+{
+    public NotFoundException(string message) : base(message) { }
+}
