@@ -1,0 +1,65 @@
+﻿@model TareaFormPageModel
+
+@if (Model.ErrorCarga is not null)
+{
+    <div class="alert alert-danger d-flex align-items-center gap-2 mb-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div>@Model.ErrorCarga</div>
+    </div>
+}
+else if (!Model.HayResponsables)
+{
+    <div class="alert alert-warning mb-0" role="alert">
+        <i class="bi bi-info-circle-fill me-1"></i>
+        Para crear tareas primero necesitas al menos un responsable.
+        <a class="alert-link" asp-page="/Responsables/Index">Ir a Responsables</a>
+    </div>
+}
+else
+{
+    <form method="post">
+        <div asp-validation-summary="ModelOnly"></div>
+
+        <div class="mb-3">
+            <label asp-for="Tarea.Titulo" class="form-label"></label>
+            <input asp-for="Tarea.Titulo" class="form-control" maxlength="200"
+                   placeholder="Ej. Preparar el informe mensual" autofocus />
+            <span asp-validation-for="Tarea.Titulo" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Tarea.Descripcion" class="form-label"></label>
+            <textarea asp-for="Tarea.Descripcion" class="form-control" rows="4" maxlength="1000"
+                      placeholder="Opcional: añade contexto o detalles"></textarea>
+            <span asp-validation-for="Tarea.Descripcion" class="text-danger small"></span>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+                <label asp-for="Tarea.Estado" class="form-label"></label>
+                <select asp-for="Tarea.Estado" asp-items="Model.EstadosItems" class="form-select"></select>
+                <span asp-validation-for="Tarea.Estado" class="text-danger small"></span>
+            </div>
+            <div class="col-sm-6">
+                <label asp-for="Tarea.FechaLimite" class="form-label"></label>
+                <input asp-for="Tarea.FechaLimite" type="date" class="form-control" />
+                <span asp-validation-for="Tarea.FechaLimite" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Tarea.ResponsableId" class="form-label"></label>
+            <select asp-for="Tarea.ResponsableId" asp-items="Model.ResponsablesItems" class="form-select">
+                <option value="">Selecciona un responsable</option>
+            </select>
+            <span asp-validation-for="Tarea.ResponsableId" class="text-danger small"></span>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-outline-secondary" asp-page="Index">Cancelar</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-lg me-1"></i>@Model.TextoBoton
+            </button>
+        </div>
+    </form>
+}

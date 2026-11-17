@@ -1,0 +1,20 @@
+﻿@page "{id:int}"
+@model EditModel
+@{
+    ViewData["Title"] = "Editar tarea";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Editar tarea</h1>
+        <p>Modifica los datos y guarda los cambios.</p>
+    </div>
+</div>
+
+<div class="tm-card form-card">
+    <partial name="_TareaForm" model="Model" />
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

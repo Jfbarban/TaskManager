@@ -1,0 +1,20 @@
+﻿@page
+@model CreateModel
+@{
+    ViewData["Title"] = "Nueva tarea";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Nueva tarea</h1>
+        <p>Rellena los datos para crearla.</p>
+    </div>
+</div>
+
+<div class="tm-card form-card">
+    <partial name="_TareaForm" model="Model" />
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
