@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TaskManager.Application.DTOs.Responsables;
 using TaskManager.Application.Interfaces;
 
 namespace TaskManager.Web.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/responsables")]
 [Produces("application/json")]

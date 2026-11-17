@@ -1,12 +1,15 @@
-using TaskManager.Infrastructure;
-using TaskManager.Application;
 using System.Text.Json.Serialization;
+using TaskManager.Application;
+using TaskManager.Infrastructure;
+using TaskManager.Web.Auth;
 using TaskManager.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
@@ -31,6 +34,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

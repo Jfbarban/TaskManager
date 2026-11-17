@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TaskManager.Application.Common;
 using TaskManager.Application.DTOs.Tareas;
 using TaskManager.Application.Interfaces;
 
 namespace TaskManager.Web.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/tareas")]
 [Produces("application/json")]
