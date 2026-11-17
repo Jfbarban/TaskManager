@@ -1,5 +1,7 @@
 using TaskManager.Infrastructure;
 using TaskManager.Application;
+using System.Text.Json.Serialization;
+using TaskManager.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,13 +11,20 @@ builder.Services.AddRazorPages();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
-var app = builder.Build();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+var app = builder.Build(); 
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -28,5 +37,6 @@ app.UseAuthorization();
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
+app.MapControllers();
 
 app.Run();
