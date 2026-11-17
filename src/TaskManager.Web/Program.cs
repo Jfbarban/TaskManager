@@ -3,6 +3,7 @@ using TaskManager.Application;
 using TaskManager.Infrastructure;
 using TaskManager.Web.Auth;
 using TaskManager.Web.Middleware;
+using TaskManager.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,8 @@ builder.Services
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddApiClient();
 
 var app = builder.Build(); 
 

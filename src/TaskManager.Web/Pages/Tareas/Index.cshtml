@@ -1,0 +1,99 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Tareas";
+    var hoy = DateOnly.FromDateTime(DateTime.Today);
+    var hayFiltros = Model.Estado.HasValue || Model.ResponsableId.HasValue;
+    var total = Model.Resultado.TotalItems;
+    var i = 0;
+}
+
+<div class="page-header">
+    <div>
+        <h1>Tareas</h1>
+        <p>@total @(total == 1 ? "tarea" : "tareas")@(hayFiltros ? " con los filtros aplicados" : "")</p>
+    </div>
+    <a class="btn btn-primary" asp-page="Create"><i class="bi bi-plus-lg me-1"></i>Nueva tarea</a>
+</div>
+
+<form method="get" class="tm-card filtros">
+    <i class="bi bi-funnel text-secondary"></i>
+
+    <select name="Estado" class="form-select" aria-label="Filtrar por estado" onchange="this.form.submit()">
+        <option value="">Todos los estados</option>
+        @foreach (var estado in Enum.GetValues<EstadoTarea>())
+        {
+            <option value="@estado" selected="@(Model.Estado == estado)">@estado.Texto()</option>
+        }
+    </select>
+
+    <select name="ResponsableId" class="form-select" aria-label="Filtrar por responsable" onchange="this.form.submit()">
+        <option value="">Todos los responsables</option>
+        @foreach (var responsable in Model.Responsables)
+        {
+            <option value="@responsable.Id" selected="@(Model.ResponsableId == responsable.Id)">@responsable.Nombre</option>
+        }
+    </select>
+
+    @if (hayFiltros)
+    {
+        <a class="btn btn-link text-decoration-none" asp-page="Index"><i class="bi bi-x-circle me-1"></i>Limpiar</a>
+    }
+</form>
+
+@if (Model.ErrorApi is not null)
+{
+    <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div>No se pudieron cargar las tareas. @Model.ErrorApi</div>
+    </div>
+}
+else if (!Model.Resultado.Items.Any())
+{
+    <div class="tm-card empty-state">
+        <div class="icon"><i class="bi bi-inbox"></i></div>
+        <h2 class="h5">@(hayFiltros ? "No hay tareas con estos filtros" : "Todavía no hay tareas")</h2>
+        <p class="text-secondary mb-4">
+            @(hayFiltros ? "Prueba a cambiar o limpiar los filtros." : "Crea la primera para empezar a organizarte.")
+        </p>
+        <a class="btn btn-primary" asp-page="Create"><i class="bi bi-plus-lg me-1"></i>Nueva tarea</a>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @foreach (var t in Model.Resultado.Items)
+        {
+            var vencida = t.Estado != EstadoTarea.Hecha && t.FechaLimite < hoy;
+
+            <div class="col">
+                <article class="tm-card tarea-card h-100 estado-@t.Estado.Css()" style="animation-delay:@(i++ * 40)ms">
+                    <div class="d-flex align-items-center justify-content-between gap-2">
+                        <span class="estado-badge"><i class="bi @t.Estado.Icono()"></i>@t.Estado.Texto()</span>
+                        <span class="fecha-chip @(vencida ? "vencida" : "")" title="Fecha límite">
+                            <i class="bi @(vencida ? "bi-exclamation-circle-fill" : "bi-calendar-event")"></i>@t.FechaLimite.Corta()
+                        </span>
+                    </div>
+
+                    <h2 class="tarea-titulo"><a asp-page="Details" asp-route-id="@t.Id">@t.Titulo</a></h2>
+                    <p class="tarea-desc">@(string.IsNullOrWhiteSpace(t.Descripcion) ? "Sin descripción" : t.Descripcion)</p>
+
+                    <div class="tarea-footer">
+                        <div class="d-flex align-items-center gap-2 min-w-0">
+                            <span class="avatar" style="--tono:@t.ResponsableNombre.Tono()">@t.ResponsableNombre.Iniciales()</span>
+                            <span class="text-truncate small fw-medium">@t.ResponsableNombre</span>
+                        </div>
+                        <div class="d-flex gap-1 flex-shrink-0">
+                            <a class="btn-icon" asp-page="Details" asp-route-id="@t.Id" title="Ver" aria-label="Ver"><i class="bi bi-eye"></i></a>
+                            <a class="btn-icon" asp-page="Edit" asp-route-id="@t.Id" title="Editar" aria-label="Editar"><i class="bi bi-pencil"></i></a>
+                            <a class="btn-icon danger" asp-page="Delete" asp-route-id="@t.Id" title="Eliminar" aria-label="Eliminar"><i class="bi bi-trash3"></i></a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+
+    <partial name="_Paginacion"
+             model="new PaginacionVm(Model.Resultado.Pagina, Model.Resultado.TotalPaginas, Model.Estado, Model.ResponsableId)" />
+}

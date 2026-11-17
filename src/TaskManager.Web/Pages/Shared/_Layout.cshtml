@@ -1,52 +1,92 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+    var pagina = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+    string Activa(string prefijo) =>
+        pagina.StartsWith(prefijo, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TaskManager.Web</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] · TaskManager</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/TaskManager.Web.styles.css" asp-append-version="true" />
+
+    <script>
+        // Aplica el tema guardado antes de pintar, para evitar parpadeos.
+        (function () {
+            var tema = localStorage.getItem('tm-theme');
+            if (!tema) tema = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', tema);
+        })();
+    </script>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <header class="app-navbar">
+        <nav class="navbar navbar-expand-sm py-2">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">TaskManager.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" asp-page="/Tareas/Index">
+                    <span class="brand-mark"><i class="bi bi-check2-square"></i></span>
+                    TaskManager
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Menú">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="menu">
+                    <ul class="navbar-nav me-auto gap-1 ms-sm-3">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link @Activa("/Tareas")" asp-page="/Tareas/Index">
+                                <i class="bi bi-card-checklist me-1"></i>Tareas
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link @Activa("/Responsables")" asp-page="/Responsables/Index">
+                                <i class="bi bi-people me-1"></i>Responsables
+                            </a>
                         </li>
                     </ul>
+                    <button id="theme-toggle" class="btn-icon" type="button" aria-label="Cambiar tema">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - TaskManager.Web - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
+    <main class="container py-4 py-lg-5 app-main">
+        @if (TempData["Exito"] is string exito)
+        {
+            <div class="alert alert-success alert-dismissible fade show alert-auto d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-check-circle-fill"></i>
+                <div>@exito</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        }
+        @if (TempData["Error"] is string error)
+        {
+            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div>@error</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <footer class="app-footer">
+        TaskManager · @DateTime.Now.Year
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

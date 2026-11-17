@@ -5,8 +5,5 @@ namespace TaskManager.Web.Pages;
 
 public class IndexModel : PageModel
 {
-    public void OnGet()
-    {
-
-    }
+    public IActionResult OnGet() => RedirectToPage("/Tareas/Index");
 }

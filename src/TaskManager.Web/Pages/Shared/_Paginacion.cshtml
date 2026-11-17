@@ -1,0 +1,38 @@
+﻿@model PaginacionVm
+
+@if (Model.TotalPaginas > 1)
+{
+    var desde = Math.Max(1, Model.Pagina - 2);
+    var hasta = Math.Min(Model.TotalPaginas, Model.Pagina + 2);
+
+    Dictionary<string, string> Ruta(int pagina)
+    {
+        var datos = new Dictionary<string, string> { ["Pagina"] = pagina.ToString() };
+        if (Model.Estado.HasValue) datos["Estado"] = Model.Estado.Value.ToString();
+        if (Model.ResponsableId.HasValue) datos["ResponsableId"] = Model.ResponsableId.Value.ToString();
+        return datos;
+    }
+
+    <nav aria-label="Paginación" class="mt-4">
+        <ul class="pagination tm-pagination justify-content-center mb-0">
+            <li class="page-item @(Model.Pagina <= 1 ? "disabled" : "")">
+                <a class="page-link" asp-page="/Tareas/Index" asp-all-route-data="Ruta(Model.Pagina - 1)" aria-label="Anterior">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+
+            @for (var p = desde; p <= hasta; p++)
+            {
+                <li class="page-item @(p == Model.Pagina ? "active" : "")">
+                    <a class="page-link" asp-page="/Tareas/Index" asp-all-route-data="Ruta(p)">@p</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.Pagina >= Model.TotalPaginas ? "disabled" : "")">
+                <a class="page-link" asp-page="/Tareas/Index" asp-all-route-data="Ruta(Model.Pagina + 1)" aria-label="Siguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}
