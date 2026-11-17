@@ -1,0 +1,117 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Responsables";
+    var total = Model.Responsables.Count;
+    var i = 0;
+}
+
+<div class="page-header">
+    <div>
+        <h1>Responsables</h1>
+        <p>@total @(total == 1 ? "responsable" : "responsables")</p>
+    </div>
+</div>
+
+<div class="tm-card p-3 mb-4">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly"></div>
+
+        <div class="row g-2 align-items-start">
+            <div class="col">
+                <label asp-for="Nuevo.Nombre" class="visually-hidden"></label>
+                <input asp-for="Nuevo.Nombre" class="form-control" maxlength="100" autocomplete="off"
+                       placeholder="Nombre del nuevo responsable" />
+                <span asp-validation-for="Nuevo.Nombre" class="text-danger small"></span>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-1"></i>Añadir
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (Model.ErrorApi is not null)
+{
+    <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div>No se pudieron cargar los responsables. @Model.ErrorApi</div>
+    </div>
+}
+else if (total == 0)
+{
+    <div class="tm-card empty-state">
+        <div class="icon"><i class="bi bi-people"></i></div>
+        <h2 class="h5">Todavía no hay responsables</h2>
+        <p class="text-secondary mb-0">Añade el primero con el formulario de arriba para poder asignarle tareas.</p>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+        @foreach (var r in Model.Responsables)
+        {
+            <div class="col">
+                <article class="tm-card responsable-card" style="animation-delay:@(i++ * 40)ms">
+                    <span class="avatar avatar-lg" style="--tono:@r.Nombre.Tono()">@r.Nombre.Iniciales()</span>
+
+                    <div class="min-w-0 flex-grow-1">
+                        <div class="fw-semibold text-truncate">@r.Nombre</div>
+                        <a class="small text-decoration-none" asp-page="/Tareas/Index" asp-route-ResponsableId="@r.Id">
+                            Ver tareas <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                    </div>
+
+                    <button type="button" class="btn-icon danger flex-shrink-0"
+                            data-bs-toggle="modal" data-bs-target="#modalEliminar"
+                            data-id="@r.Id" data-nombre="@r.Nombre"
+                            title="Eliminar" aria-label="Eliminar a @r.Nombre">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </article>
+            </div>
+        }
+    </div>
+}
+
+<!-- Ventana modal de confirmación (una sola, reutilizada por todas las tarjetas) -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Eliminar">
+                <div class="modal-body text-center p-4">
+                    <div class="empty-state p-0 mb-3">
+                        <div class="icon danger mb-0"><i class="bi bi-person-x"></i></div>
+                    </div>
+                    <h2 class="h5 fw-bold" id="modalEliminarTitulo">¿Eliminar responsable?</h2>
+                    <p class="text-secondary mb-0">
+                        Vas a eliminar a <strong id="eliminar-nombre"></strong>.
+                        Si tiene tareas asignadas, no se podrá eliminar hasta que se borren o se reasignen.
+                    </p>
+                    <input type="hidden" name="id" id="eliminar-id" />
+                </div>
+                <div class="modal-footer border-0 justify-content-center gap-2 pb-4 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash3 me-1"></i>Sí, eliminar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Rellena la ventana modal con los datos de la tarjeta que se ha pulsado.
+        document.getElementById( 'modalEliminar' ).addEventListener( 'show.bs.modal', function ( evento )
+        {
+            var boton = evento.relatedTarget;
+            this.querySelector( '#eliminar-id' ).value = boton.dataset.id;
+            this.querySelector( '#eliminar-nombre' ).textContent = boton.dataset.nombre;
+        } );
+    </script>
+}

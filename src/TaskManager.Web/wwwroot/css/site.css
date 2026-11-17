@@ -458,3 +458,38 @@ body {
     color: #dc2626;
     background: rgba(220, 38, 38, .12);
 }
+
+/* ============ Responsables ============ */
+.responsable-card {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    padding: 1rem 1.1rem;
+    transition: transform .18s ease, box-shadow .18s ease;
+    animation: tm-fade-up .35s ease both;
+}
+
+    .responsable-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--tm-shadow-hover);
+    }
+
+.avatar-lg {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: .95rem;
+}
+
+.modal-content {
+    border: 0;
+    border-radius: var(--tm-radius);
+    background: var(--tm-surface);
+    box-shadow: var(--tm-shadow-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .responsable-card {
+        animation: none;
+        transition: none;
+    }
+}
